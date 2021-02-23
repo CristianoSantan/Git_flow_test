@@ -1,0 +1,55 @@
+Terminador de linha
+LF => Line Feed (ASCII 10)
+CRLF => Carriage Return + Line Feed (ASCII 13+10)
+Isto é a forma como as linhas de texto de arquivo terminam. Ou com apenas um caractere ou com os dois. Em geral o primeiro é preferido em um sistema operacional (Linux por exemplo) e o segundo preferido em outro (Windows).
+
+Terminador de linha é a forma como é indicado o fim de cada linha de um arquivo texto. Precisa de algum caractere para determinar que a linha acabou. Em geral esse caractere não é mostrado no texto em editores e listagens mas ele está lá no arquivo. Sem ele como saberia que a linha acabou? Podemos dizer, bem a grosso modo, que isto é o ENTER que está lá.
+
+Alguns editores possuem uma opção para mostrar esses caracteres de forma especial.
+
+inserir a descrição da imagem aqui
+
+O ideal é manter sempre o mesmo padrão (alguns softwares podem até ter problemas por causa disto).
+
+Como o Git lida com isso
+Se não há consistência o Git pode converter por você.
+
+Esta mensagem só está te avisando que fez a conversão para você.
+
+Você pode mudar este comportamento com:
+
+git config core.autocrlf true
+mas o mais comum é deixar como
+
+git config core.autocrlf input
+Você provavelmente gravou o arquivo com um terminador de linha que não é o desejável. Ou talvez o arquivo tenha vindo de outro lugar que tem um terminador diferente.
+
+O que significa LF e CRLF?
+
+LF significa Line Feed e CRLF significa Carriage Return Line Feed. Ambos são formas de quebra de linha diferentes nos arquivos. O LF é adotado por sistemas baseados em Linux/Unix e o CRLF é adotado pelo Windows.
+
+Este tipo de aviso:
+
+warning: LF will be replaced by CRLF in testes.html
+
+É bem comum quando em um mesmo repositório há pessoas trabalhando no mesmo arquivo com Linux e outras com Windows. Como muitos editores não respeitam o padrão de quebra de linha adotado no arquivo, acabam sobreescrevendo a quebra de linha existente, gerando esta confusão.
+
+Para nossa sorte, o Git consegue lidar com este cenário convertendo de um tipo de quebra de linha para outro. No aviso acima, o Git quer dizer que você perderá a quebra de linha unix LF depois do commit (sendo substituído pelo formato Windows CRLF). O Git, neste caso, não espera que você use o formato unix LF no Windows.
+
+A flag do Git que nos ajuda a controlar isto é o core.autocrlf. Ele funciona assim:
+
+core.autocrlf=true:      core.autocrlf=input:     core.autocrlf=false:
+
+        repo                     repo                     repo
+      ^      V                 ^      V                 ^      V
+     /        \               /        \               /        \
+crlf->lf    lf->crlf     crlf->lf       \             /          \      
+   /            \           /            \           /            \
+A recomendação geral para Windows é deixar esta opção como true.
+
+git config --global core.autocrlf true
+Pois resumindo:
+
+Usar core.autocrlf = true se planeja usar este projeto no Linux/Unix e no Windows (não querendo configurar seu editor para usar o formato Unix)
+Usar core.autocrlf = false se planeja usar o projeto apenas no Windows (ou se você tem configurado seu editor para o usar o formato de quebra de linha Unix)
+Não usar core.autocrlf = input a menos que você tenha um bom motivo (exemplo: está usando utilitários unix no Windows)
